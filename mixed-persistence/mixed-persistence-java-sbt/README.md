@@ -20,12 +20,25 @@ bind(SlickOffsetStore.class).to(JavadslJdbcOffsetStore.class);
 
 ## Testing the recipe
 
-You can test this recipe using 2 separate terminals.
+You can test this recipe using 2 or more separate terminals.
+
+First start Cassandra and Zipkin:
+
+```
+docker run -p 9042:9042 --rm --name cassandra -d cassandra:3.11.4
+docker run -d -p 9411:9411 --name zipkin openzipkin/zipkin
+```
 
 On one terminal start the service:
 
 ```
-sbt runAll
+sbt "hello-impl/test:runMain play.core.server.ProdServerStart"
+```
+
+If you want to start more cluster nodes, then you need to change the akka and play ports like this for the new nodes:
+
+```
+sbt "hello-impl/test:runMain -Dakka.remote.netty.tcp.port=2553 -Dhttp.port=9003 play.core.server.ProdServerStart"
 ```
 
 On a separate terminal, use `curl` to trigger some events in `HelloService`:
@@ -45,3 +58,5 @@ curl http://localhost:9000/api/greetings
 ```
 
 This is eventually consistent, so it might take a few tries before you see all of the results.
+
+Check out the results in Zipkin `http://localhost:9411/zipkin/`

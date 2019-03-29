@@ -21,7 +21,7 @@ val h2 = "com.h2database" % "h2" % "1.4.196"
 val hibernate = "org.hibernate" % "hibernate-core" % "5.2.12.Final"
 
 lazy val `hello-impl` = (project in file("hello-impl"))
-  .enablePlugins(LagomJava)
+  .enablePlugins(LagomJava, Cinnamon)
   .settings(common: _*)
   .settings(
     libraryDependencies ++= Seq(
@@ -30,8 +30,12 @@ lazy val `hello-impl` = (project in file("hello-impl"))
       lagomJavadslTestKit,
       lombok,
       h2,
-      hibernate
-    )
+      hibernate,
+      Cinnamon.library.cinnamonOpenTracing,
+      Cinnamon.library.cinnamonOpenTracingZipkin
+    ),
+    cinnamon in run := true,
+    cinnamon in test := true
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`hello-api`)
